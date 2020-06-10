@@ -3,7 +3,7 @@ terraform {
 }
 
 module "labels" {
-  source    = "git::https://github.com/cloudposse/terraform-terraform-label.git?ref=master" //TODO: PIN TO VERSION
+  source    = "git::https://github.com/cloudposse/terraform-terraform-label.git?ref=tags/0.4.0"
   namespace = var.namespace
   stage     = var.stage
   name      = var.name
