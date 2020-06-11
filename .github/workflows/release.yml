@@ -1,0 +1,20 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-18.04
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Delete test results
+        run: '[ ! -e test/results ] || rm test/results'
+
+      - name: Release
+        env:
+          GITHUB_TOKEN: ${RELEASE_GITHUB_TOKEN}
+        run: npx release-it -- minor --ci

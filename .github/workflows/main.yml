@@ -8,15 +8,18 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     
-    - name: Setup Golang
-      uses: actions/setup-go@v2
-      with:
-        go-version: '^1.13.1'    
-    
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v1
       with:
         terraform_version: 0.12.25
-    
-    - name: test
-      run: cd test && go test
+
+    - name: format check
+      run: terraform fmt -check -diff -recursive
+
+    - name: validate
+      run: cd test/fixtures/default && terraform init && terraform validate
+
+    - name: Release
+      env:
+        GITHUB_TOKEN: ${RELEASE_GITHUB_TOKEN}
+      run: npx release-it -- --dry-run minor --ci
