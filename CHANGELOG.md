@@ -1,3 +1,10 @@
+# 1.0.0 (2020-07-03)
+
+
+### Features
+
+* initial release ([346ef87](http://bitbucket.org/adaptavistlabs/module-aws-vpc/commits/346ef87a34c87c5da0a8da2cb7c94ff193b97d8c))
+
 # 1.0.0 (2020-06-25)
 
 
