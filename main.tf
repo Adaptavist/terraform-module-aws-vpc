@@ -26,7 +26,7 @@ resource "aws_subnet" "public" {
   ipv6_cidr_block                 = var.enable_ipv6 ? cidrsubnet(aws_vpc.this.ipv6_cidr_block, 8, 0 + count.index) : null
   assign_ipv6_address_on_creation = var.enable_ipv6
   availability_zone               = var.availability_zones[count.index]
-  tags                            = module.labels.tags
+  tags                            = merge(module.labels.tags, { Name = "${module.labels.name}-public" })
 }
 
 resource "aws_subnet" "private" {
@@ -36,7 +36,7 @@ resource "aws_subnet" "private" {
   ipv6_cidr_block                 = var.enable_ipv6 ? cidrsubnet(aws_vpc.this.ipv6_cidr_block, 8, 20 + count.index) : null
   assign_ipv6_address_on_creation = var.enable_ipv6
   availability_zone               = var.availability_zones[count.index]
-  tags                            = module.labels.tags
+  tags                            = merge(module.labels.tags, { Name = "${module.labels.name}-private" })
 }
 
 resource "aws_subnet" "isolated" {
@@ -46,7 +46,7 @@ resource "aws_subnet" "isolated" {
   ipv6_cidr_block                 = var.enable_ipv6 ? cidrsubnet(aws_vpc.this.ipv6_cidr_block, 8, 10 + count.index) : null
   assign_ipv6_address_on_creation = var.enable_ipv6
   availability_zone               = var.availability_zones[count.index]
-  tags                            = module.labels.tags
+  tags                            = merge(module.labels.tags, { Name = "${module.labels.name}-isolated" })
 }
 
 // NAT GATEWAY AND ROUTING
@@ -64,6 +64,7 @@ resource "aws_internet_gateway" "this" {
 
 resource "aws_egress_only_internet_gateway" "this" {
   vpc_id = aws_vpc.this.id
+  tags   = module.labels.tags
 }
 
 resource "aws_nat_gateway" "this" {
@@ -72,54 +73,51 @@ resource "aws_nat_gateway" "this" {
   allocation_id = aws_eip.this.*.id[count.index]
   tags          = module.labels.tags
 }
+
 resource "aws_route_table" "private" {
-  count  = length(var.availability_zones)
   vpc_id = aws_vpc.this.id
-  tags   = module.labels.tags
+  tags   = merge(module.labels.tags, { Name = "${module.labels.name}-private" })
+}
 
-  route {
-    cidr_block     = "0.0.0.0/0"
-    nat_gateway_id = aws_nat_gateway.this.*.id[count.index]
-  }
+resource "aws_route" "private_ipv4" {
+  route_table_id         = aws_route_table.private.id
+  destination_cidr_block = "0.0.0.0/0"
+  gateway_id             = aws_internet_gateway.this.id
+}
 
-  // IPv6 route only when enabled
-  dynamic "route" {
-    for_each = var.enable_ipv6 ? [aws_egress_only_internet_gateway.this.id] : []
-    content {
-      ipv6_cidr_block        = "::/0"
-      egress_only_gateway_id = route.value
-    }
-  }
+resource "aws_route" "private_ipv6" {
+  count                       = length(var.availability_zones)
+  route_table_id              = aws_route_table.private.id
+  destination_ipv6_cidr_block = "::/0"
+  gateway_id                  = element(aws_egress_only_internet_gateway.this.*.id, count.index)
 }
 
 resource "aws_route_table_association" "private" {
   count          = length(var.availability_zones)
-  subnet_id      = aws_subnet.private.*.id[count.index]
-  route_table_id = aws_route_table.private.*.id[count.index]
+  subnet_id      = aws_subnet.private[count.index].id
+  route_table_id = aws_route_table.private.id
 }
 
 resource "aws_route_table" "public" {
   vpc_id = aws_vpc.this.id
-  tags   = module.labels.tags
+  tags   = merge(module.labels.tags, { Name = "${module.labels.name}-public" })
+}
 
-  route {
-    cidr_block = "0.0.0.0/0"
-    gateway_id = aws_internet_gateway.this.id
-  }
+resource "aws_route" "public_ipv4" {
+  route_table_id         = aws_route_table.public.id
+  destination_cidr_block = "0.0.0.0/0"
+  gateway_id             = aws_internet_gateway.this.id
+}
 
-  // IPv6 route only when enabled
-  dynamic "route" {
-    for_each = var.enable_ipv6 ? aws_egress_only_internet_gateway.this.*.id : []
-    content {
-      ipv6_cidr_block        = "::/0"
-      egress_only_gateway_id = route.value
-    }
-  }
+resource "aws_route" "public_ipv6" {
+  route_table_id              = aws_route_table.public.id
+  destination_ipv6_cidr_block = "::/0"
+  gateway_id                  = aws_internet_gateway.this.id
 }
 
 resource "aws_route_table_association" "public" {
   count          = length(var.availability_zones)
-  subnet_id      = aws_subnet.public.*.id[count.index]
+  subnet_id      = aws_subnet.public[count.index].id
   route_table_id = aws_route_table.public.id
 }
 
