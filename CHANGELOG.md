@@ -1,3 +1,10 @@
+## [1.0.1](http://bitbucket.org/adaptavistlabs/module-aws-vpc/compare/v1.0.0...v1.0.1) (2020-07-16)
+
+
+### Bug Fixes
+
+* moved routes out of route tables and added tags to resources ([51159c5](http://bitbucket.org/adaptavistlabs/module-aws-vpc/commits/51159c5349f7c28aa74fcfef951ea04244e48ec4))
+
 # 1.0.0 (2020-07-03)
 
 
