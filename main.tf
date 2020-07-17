@@ -89,7 +89,7 @@ resource "aws_route" "private_ipv6" {
   count                       = length(var.availability_zones)
   route_table_id              = aws_route_table.private.id
   destination_ipv6_cidr_block = "::/0"
-  gateway_id                  = element(aws_egress_only_internet_gateway.this.*.id, count.index)
+  egress_only_gateway_id      = element(aws_egress_only_internet_gateway.this.*.id, count.index)
 }
 
 resource "aws_route_table_association" "private" {
