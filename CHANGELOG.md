@@ -1,3 +1,10 @@
+## [1.0.2](http://bitbucket.org/adaptavistlabs/module-aws-vpc/compare/v1.0.1...v1.0.2) (2020-07-20)
+
+
+### Bug Fixes
+
+* changed gateway id for private_ipv6 ([19b0320](http://bitbucket.org/adaptavistlabs/module-aws-vpc/commits/19b0320e754a1cc3044bf837b72692c18c7c8f35))
+
 ## [1.0.1](http://bitbucket.org/adaptavistlabs/module-aws-vpc/compare/v1.0.0...v1.0.1) (2020-07-16)
 
 
