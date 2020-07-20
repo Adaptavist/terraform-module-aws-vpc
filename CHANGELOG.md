@@ -1,3 +1,10 @@
+## [1.0.3](http://bitbucket.org/adaptavistlabs/module-aws-vpc/compare/v1.0.2...v1.0.3) (2020-07-20)
+
+
+### Bug Fixes
+
+* **routing:** fix egress routing from private subnet ([ee35903](http://bitbucket.org/adaptavistlabs/module-aws-vpc/commits/ee3590366289ec4e9c489bd7910dab7c91557e6d))
+
 ## [1.0.2](http://bitbucket.org/adaptavistlabs/module-aws-vpc/compare/v1.0.1...v1.0.2) (2020-07-20)
 
 
