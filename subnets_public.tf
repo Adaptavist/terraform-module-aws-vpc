@@ -5,12 +5,12 @@ resource "aws_subnet" "public" {
   ipv6_cidr_block                 = var.enable_ipv6 == true ? cidrsubnet(aws_vpc.this.ipv6_cidr_block, 8, 0 + count.index) : null
   assign_ipv6_address_on_creation = var.enable_ipv6
   availability_zone               = var.availability_zones[count.index]
-  tags                            = merge(module.labels.tags, { Name = "${module.labels.name}-public" })
+  tags                            = merge(module.labels.tags, { "Name" = "${module.labels.name}-public" })
 }
 
 resource "aws_route_table" "public" {
   vpc_id = aws_vpc.this.id
-  tags   = merge(module.labels.tags, { Name = "${module.labels.name}-public" })
+  tags   = merge(module.labels.tags, { "Name" = "${module.labels.name}-public" })
 }
 
 resource "aws_route" "public_ipv4" {

@@ -5,13 +5,13 @@ resource "aws_subnet" "private" {
   ipv6_cidr_block                 = var.enable_ipv6 == true ? cidrsubnet(aws_vpc.this.ipv6_cidr_block, 8, 20 + count.index) : null
   assign_ipv6_address_on_creation = var.enable_ipv6
   availability_zone               = var.availability_zones[count.index]
-  tags                            = merge(module.labels.tags, { Name = "${module.labels.name}-private" })
+  tags                            = merge(module.labels.tags, { "Name" = "${module.labels.name}-private" })
 }
 
 resource "aws_route_table" "private" {
   count  = length(var.availability_zones)
   vpc_id = aws_vpc.this.id
-  tags   = merge(module.labels.tags, { Name = "${module.labels.name}-private-${count.index}" })
+  tags   = merge(module.labels.tags, { "Name" = "${module.labels.name}-private-${count.index}" })
 }
 
 resource "aws_route_table_association" "private" {

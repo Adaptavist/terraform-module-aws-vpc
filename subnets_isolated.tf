@@ -5,7 +5,7 @@ resource "aws_subnet" "isolated" {
   ipv6_cidr_block                 = var.enable_ipv6 == true ? cidrsubnet(aws_vpc.this.ipv6_cidr_block, 8, 10 + count.index) : null
   assign_ipv6_address_on_creation = var.enable_ipv6
   availability_zone               = var.availability_zones[count.index]
-  tags                            = merge(module.labels.tags, { Name = "${module.labels.name}-isolated" })
+  tags                            = merge(module.labels.tags, { "Name" = "${module.labels.name}-isolated" })
 }
 
 resource "aws_network_acl" "isolated" {
