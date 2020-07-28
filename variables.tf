@@ -34,6 +34,7 @@ variable "map_public_ipv4" {
   description = "Map public IPv4 on creation"
   type        = bool
   default     = false
+}
 
 variable "enable_ipv6" {
   description = "enable IPv6 on the VPC"
