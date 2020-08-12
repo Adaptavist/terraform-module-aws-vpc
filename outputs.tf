@@ -1,4 +1,4 @@
-output vpc_id {
+output "vpc_id" {
   value = aws_vpc.this.id
 }
 
@@ -18,6 +18,10 @@ output "public_subnet_ids" {
   value = aws_subnet.public.*.id
 }
 
+output "public_subnet" {
+  value = aws_subnet.public
+}
+
 output "public_route_table_ids" {
   value = aws_route_table.public.*.id
 }
@@ -34,6 +38,10 @@ output "private_subnet_ids" {
   value = aws_subnet.private.*.id
 }
 
+output "private_subnet" {
+  value = aws_subnet.private
+}
+
 output "private_route_table_ids" {
   value = aws_route_table.private.*.id
 }
@@ -48,6 +56,10 @@ output "private_subnet_ip6_cidrs" {
 
 output "isolated_subnet_ids" {
   value = aws_subnet.isolated.*.id
+}
+
+output "isolated_subnet" {
+  value = aws_subnet.isolated
 }
 
 output "isolated_subnet_cidrs" {

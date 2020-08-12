@@ -23,10 +23,11 @@ resource "aws_subnet" "public" {
   count                           = length(var.availability_zones)
   vpc_id                          = aws_vpc.this.id
   cidr_block                      = cidrsubnet(aws_vpc.this.cidr_block, 8, 0 + count.index)
+  map_public_ip_on_launch         = var.map_public_ipv4
   ipv6_cidr_block                 = var.enable_ipv6 == true ? cidrsubnet(aws_vpc.this.ipv6_cidr_block, 8, 0 + count.index) : null
   assign_ipv6_address_on_creation = var.enable_ipv6
   availability_zone               = var.availability_zones[count.index]
-  tags                            = merge(module.labels.tags, { Name = "${module.labels.name}-public" })
+  tags                            = merge(module.labels.tags, { Name = "${module.labels.name}-public-${count.index}" })
 }
 
 resource "aws_subnet" "private" {
@@ -36,7 +37,7 @@ resource "aws_subnet" "private" {
   ipv6_cidr_block                 = var.enable_ipv6 == true ? cidrsubnet(aws_vpc.this.ipv6_cidr_block, 8, 20 + count.index) : null
   assign_ipv6_address_on_creation = var.enable_ipv6
   availability_zone               = var.availability_zones[count.index]
-  tags                            = merge(module.labels.tags, { Name = "${module.labels.name}-private" })
+  tags                            = merge(module.labels.tags, { Name = "${module.labels.name}-private-${count.index}" })
 }
 
 resource "aws_subnet" "isolated" {
@@ -46,7 +47,7 @@ resource "aws_subnet" "isolated" {
   ipv6_cidr_block                 = var.enable_ipv6 == true ? cidrsubnet(aws_vpc.this.ipv6_cidr_block, 8, 10 + count.index) : null
   assign_ipv6_address_on_creation = var.enable_ipv6
   availability_zone               = var.availability_zones[count.index]
-  tags                            = merge(module.labels.tags, { Name = "${module.labels.name}-isolated" })
+  tags                            = merge(module.labels.tags, { Name = "${module.labels.name}-isolated-${count.index}" })
 }
 
 // NAT GATEWAY AND ROUTING
@@ -112,10 +113,10 @@ resource "aws_route" "public_ipv4" {
 }
 
 resource "aws_route" "public_ipv6" {
-  count                       = var.enable_ipv6 == true ? length(var.availability_zones) : 0
+  count                       = var.enable_ipv6 == true ? 1 : 0
   route_table_id              = aws_route_table.public.id
   destination_ipv6_cidr_block = "::/0"
-  egress_only_gateway_id      = aws_egress_only_internet_gateway.this.id
+  gateway_id                  = aws_internet_gateway.this.id
 }
 
 resource "aws_route_table_association" "public" {
