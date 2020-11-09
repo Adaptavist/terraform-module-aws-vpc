@@ -1,3 +1,10 @@
+# [1.1.0](http://bitbucket.org/adaptavistlabs/module-aws-vpc/compare/v1.0.3...v1.1.0) (2020-11-09)
+
+
+### Features
+
+* update the labels module; npm audit ([4e314c3](http://bitbucket.org/adaptavistlabs/module-aws-vpc/commits/4e314c327f2a64053ece11eadbae8748eb85e60c))
+
 ## [1.0.3](http://bitbucket.org/adaptavistlabs/module-aws-vpc/compare/v1.0.2...v1.0.3) (2020-07-20)
 
 
