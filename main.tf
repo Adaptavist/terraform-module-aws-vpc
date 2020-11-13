@@ -59,7 +59,8 @@ resource "aws_eip" "this" {
 }
 
 resource "aws_internet_gateway" "this" {
-  vpc_id = aws_vpc.this.id && var.enable_public_subnet
+  count  = var.enable_public_subnet ? 1 : 0
+  vpc_id = aws_vpc.this.id
   tags   = module.labels.tags
 }
 
