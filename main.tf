@@ -20,31 +20,31 @@ resource "aws_vpc" "this" {
 }
 
 resource "aws_subnet" "public" {
-  count                           = length(var.availability_zones)
+  count                           = length(var.availability_zones) && var.enable_public_subnet
   vpc_id                          = aws_vpc.this.id
   cidr_block                      = cidrsubnet(aws_vpc.this.cidr_block, 8, 0 + count.index)
   map_public_ip_on_launch         = var.map_public_ipv4
-  ipv6_cidr_block                 = var.enable_ipv6 == true ? cidrsubnet(aws_vpc.this.ipv6_cidr_block, 8, 0 + count.index) : null
+  ipv6_cidr_block                 = var.enable_ipv6 ? cidrsubnet(aws_vpc.this.ipv6_cidr_block, 8, 0 + count.index) : null
   assign_ipv6_address_on_creation = var.enable_ipv6
   availability_zone               = var.availability_zones[count.index]
   tags                            = merge(module.labels.tags, { Name = "${module.labels.name}-public-${count.index}" })
 }
 
 resource "aws_subnet" "private" {
-  count                           = length(var.availability_zones)
+  count                           = length(var.availability_zones) && var.enable_private_subnet
   vpc_id                          = aws_vpc.this.id
   cidr_block                      = cidrsubnet(aws_vpc.this.cidr_block, 4, 2 + count.index)
-  ipv6_cidr_block                 = var.enable_ipv6 == true ? cidrsubnet(aws_vpc.this.ipv6_cidr_block, 8, 20 + count.index) : null
+  ipv6_cidr_block                 = var.enable_ipv6 ? cidrsubnet(aws_vpc.this.ipv6_cidr_block, 8, 20 + count.index) : null
   assign_ipv6_address_on_creation = var.enable_ipv6
   availability_zone               = var.availability_zones[count.index]
   tags                            = merge(module.labels.tags, { Name = "${module.labels.name}-private-${count.index}" })
 }
 
 resource "aws_subnet" "isolated" {
-  count                           = length(var.availability_zones)
+  count                           = length(var.availability_zones) && var.enable_isolated_subnet
   vpc_id                          = aws_vpc.this.id
   cidr_block                      = cidrsubnet(aws_vpc.this.cidr_block, 7, 4 + count.index)
-  ipv6_cidr_block                 = var.enable_ipv6 == true ? cidrsubnet(aws_vpc.this.ipv6_cidr_block, 8, 10 + count.index) : null
+  ipv6_cidr_block                 = var.enable_ipv6 ? cidrsubnet(aws_vpc.this.ipv6_cidr_block, 8, 10 + count.index) : null
   assign_ipv6_address_on_creation = var.enable_ipv6
   availability_zone               = var.availability_zones[count.index]
   tags                            = merge(module.labels.tags, { Name = "${module.labels.name}-isolated-${count.index}" })
@@ -53,74 +53,77 @@ resource "aws_subnet" "isolated" {
 // NAT GATEWAY AND ROUTING
 
 resource "aws_eip" "this" {
-  count = length(var.availability_zones)
+  count = length(var.availability_zones) && var.enable_private_subnet
   vpc   = true
   tags  = module.labels.tags
 }
 
 resource "aws_internet_gateway" "this" {
-  vpc_id = aws_vpc.this.id
+  vpc_id = aws_vpc.this.id && var.enable_public_subnet
   tags   = module.labels.tags
 }
 
 resource "aws_egress_only_internet_gateway" "this" {
+  count  = var.enable_ipv6 && var.enable_private_subnet ? 1 : 0
   vpc_id = aws_vpc.this.id
   tags   = module.labels.tags
 }
 
 resource "aws_nat_gateway" "this" {
-  count         = length(var.availability_zones)
+  count         = length(var.availability_zones) && var.enable_private_subnet
   subnet_id     = aws_subnet.public.*.id[count.index]
   allocation_id = aws_eip.this.*.id[count.index]
   tags          = module.labels.tags
 }
 
 resource "aws_route_table" "private" {
-  count  = length(var.availability_zones)
+  count  = length(var.availability_zones) && var.enable_private_subnet
   vpc_id = aws_vpc.this.id
   tags   = merge(module.labels.tags, { Name = "${module.labels.name}-private-${count.index}" })
 }
 
 resource "aws_route_table_association" "private" {
-  count          = length(var.availability_zones)
+  count          = length(var.availability_zones) && var.enable_private_subnet
   subnet_id      = aws_subnet.private[count.index].id
   route_table_id = aws_route_table.private[count.index].id
 }
 
 resource "aws_route" "private_ipv4" {
-  count                  = length(var.availability_zones)
+  count                  = length(var.availability_zones) && var.enable_private_subnet
   route_table_id         = aws_route_table.private[count.index].id
   nat_gateway_id         = aws_nat_gateway.this[count.index].id
   destination_cidr_block = "0.0.0.0/0"
 }
 
 resource "aws_route" "private_ipv6" {
-  count                       = var.enable_ipv6 == true ? length(var.availability_zones) : 0
+  count                       = var.enable_ipv6 && var.enable_private_subnet ? length(var.availability_zones) : 0
   route_table_id              = aws_route_table.private[count.index].id
   egress_only_gateway_id      = aws_egress_only_internet_gateway.this.id
   destination_ipv6_cidr_block = "::/0"
 }
 
 resource "aws_route_table" "public" {
+  count  = var.enable_public_subnet ? 1 : 0
   vpc_id = aws_vpc.this.id
   tags   = merge(module.labels.tags, { Name = "${module.labels.name}-public" })
 }
 
 resource "aws_route" "public_ipv4" {
+  count                  = var.enable_public_subnet ? 1 : 0
   route_table_id         = aws_route_table.public.id
   destination_cidr_block = "0.0.0.0/0"
   gateway_id             = aws_internet_gateway.this.id
 }
 
 resource "aws_route" "public_ipv6" {
-  count                       = var.enable_ipv6 == true ? 1 : 0
+  count                       = var.enable_ipv6 && var.enable_public_subnet ? 1 : 0
   route_table_id              = aws_route_table.public.id
   destination_ipv6_cidr_block = "::/0"
   gateway_id                  = aws_internet_gateway.this.id
 }
 
 resource "aws_route_table_association" "public" {
-  count          = length(var.availability_zones)
+  count          = length(var.availability_zones) && var.enable_public_subnet ? 1 : 0
   subnet_id      = aws_subnet.public[count.index].id
   route_table_id = aws_route_table.public.id
 }
@@ -128,6 +131,7 @@ resource "aws_route_table_association" "public" {
 // ACL FOR isolated SUBNET
 
 resource "aws_network_acl" "isolated" {
+  count      = var.enable_isolated_subnet ? 1 : 0
   vpc_id     = aws_vpc.this.id
   subnet_ids = aws_subnet.isolated.*.id
   tags       = module.labels.tags
