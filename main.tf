@@ -98,7 +98,7 @@ resource "aws_route" "private_ipv4" {
 resource "aws_route" "private_ipv6" {
   count                       = var.enable_ipv6 && var.enable_private_subnet ? length(var.availability_zones) : 0
   route_table_id              = aws_route_table.private[count.index].id
-  egress_only_gateway_id      = aws_egress_only_internet_gateway.this[count.index].id
+  egress_only_gateway_id      = aws_egress_only_internet_gateway.this[aws_egress_only_internet_gateway.this.count].id
   destination_ipv6_cidr_block = "::/0"
 }
 
@@ -112,20 +112,20 @@ resource "aws_route" "public_ipv4" {
   count                  = var.enable_public_subnet ? 1 : 0
   route_table_id         = aws_route_table.public[count.index].id
   destination_cidr_block = "0.0.0.0/0"
-  gateway_id             = aws_internet_gateway.this[count.index].id
+  gateway_id             = aws_internet_gateway.this[aws_internet_gateway.this.count].id
 }
 
 resource "aws_route" "public_ipv6" {
   count                       = var.enable_ipv6 && var.enable_public_subnet ? 1 : 0
   route_table_id              = aws_route_table.public[count.index].id
   destination_ipv6_cidr_block = "::/0"
-  gateway_id                  = aws_internet_gateway.this[count.index].id
+  gateway_id                  = aws_internet_gateway.this[aws_internet_gateway.this.count].id
 }
 
 resource "aws_route_table_association" "public" {
   count          = var.enable_public_subnet ? length(var.availability_zones) : 0
   subnet_id      = aws_subnet.public[count.index].id
-  route_table_id = aws_route_table.public[count.index].id
+  route_table_id = aws_route_table.public[aws_route_table.public.count].id
 }
 
 // ACL FOR isolated SUBNET
