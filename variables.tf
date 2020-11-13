@@ -59,3 +59,22 @@ variable "instance_tenancy" {
   description = "EC2 instance tenancy (default, dedicated)"
   default     = "default"
 }
+
+// feature flags
+variable "enable_public_subnet" {
+  type        = bool
+  description = "Flag to enable public subnets"
+  default     = true
+}
+
+variable "enable_private_subnet" {
+  type        = bool
+  description = "Flag to enable private subnets"
+  default     = true
+}
+
+variable "enable_isolated_subnet" {
+  type        = bool
+  description = "Flag to enable isolated subnets"
+  default     = true
+}
