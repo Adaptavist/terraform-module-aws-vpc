@@ -1,3 +1,10 @@
+## [1.1.1](http://bitbucket.org/adaptavistlabs/module-aws-vpc/compare/v1.1.0...v1.1.1) (2020-12-15)
+
+
+### Bug Fixes
+
+* **flags:** flags for public, private and isolated subnets ([38899a8](http://bitbucket.org/adaptavistlabs/module-aws-vpc/commits/38899a850a28933626e048e871124e82f41044d8))
+
 # [1.1.0](http://bitbucket.org/adaptavistlabs/module-aws-vpc/compare/v1.0.3...v1.1.0) (2020-11-09)
 
 
