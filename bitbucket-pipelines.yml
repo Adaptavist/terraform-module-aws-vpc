@@ -1,7 +1,7 @@
 definitions:
   tests: &test
     name: Tests
-    image: adaptavist/all-tools:openjdk11-latest-0.13.5
+    image: adaptavist/terraform:0.13.5-alpine
     script:
       - (echo ${PIPELINE_GIT_PRIVATE_KEY} | base64 -d >> ~/.ssh/id_rsa) && chmod 0600 ~/.ssh/id_rsa
       - terraform fmt -check -recursive -diff
