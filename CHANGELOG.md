@@ -1,3 +1,10 @@
+## [1.1.3](http://bitbucket.org/adaptavistlabs/module-aws-vpc/compare/v1.1.2...v1.1.3) (2021-12-20)
+
+
+### Bug Fixes
+
+* setting key so git mirror works ([a275e6e](http://bitbucket.org/adaptavistlabs/module-aws-vpc/commits/a275e6e8cd4f9a537239a53170abca9abf264feb))
+
 ## [1.1.2](http://bitbucket.org/adaptavistlabs/module-aws-vpc/compare/v1.1.1...v1.1.2) (2021-12-20)
 
 
