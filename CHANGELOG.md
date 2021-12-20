@@ -1,3 +1,12 @@
+## [1.1.2](http://bitbucket.org/adaptavistlabs/module-aws-vpc/compare/v1.1.1...v1.1.2) (2021-12-20)
+
+
+### Bug Fixes
+
+* use all tools ([fea4b95](http://bitbucket.org/adaptavistlabs/module-aws-vpc/commits/fea4b95a1d21964aa965d93abb9a5da336adc640))
+* use terraform 13 ([2445e49](http://bitbucket.org/adaptavistlabs/module-aws-vpc/commits/2445e491a88f43ded21797acdd00f93f981b6083))
+* version conflicts ([a45fed2](http://bitbucket.org/adaptavistlabs/module-aws-vpc/commits/a45fed27c21a06a4945275a162e9b1717441bbb6))
+
 ## [1.1.1](http://bitbucket.org/adaptavistlabs/module-aws-vpc/compare/v1.1.0...v1.1.1) (2020-12-15)
 
 
